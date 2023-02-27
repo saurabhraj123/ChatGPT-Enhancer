@@ -1,0 +1,41 @@
+{
+    "manifest_version": 3,
+    "name": "ChatGPT Anywhere",
+    "description": "An extension for easy access to ChatGPT with enhanced functionalities",
+    "version": "1.0",
+    "permissions": [
+        "tabs",
+        "commands"
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "https://chat.openai.com/chat/*"
+            ],
+            "js": [
+                "gpt_script.js"
+            ]
+        },
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "global_script.js"
+            ]
+        }
+    ],
+    "commands": {
+        "start_gpt": {
+            "suggested_key": "Ctrl+Shift+Q",
+            "description": "Start ChatGPT window on any screen"
+        },
+        "run-foo": {
+            "suggested_key": "Ctrl+Shift+Y",
+            "description": "Run \"foo\" on the current page."
+        }
+    }
+}

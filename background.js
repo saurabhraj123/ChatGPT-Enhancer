@@ -5,8 +5,16 @@ chrome.commands.onCommand.addListener(async (command) => {
         if(tabID === -1) {
             openChatGPT();
         }else {
-            sendMessage("on_screen_popup");
+            sendMessageToActiveTab("on_screen_popup");
         }
+    }
+})
+
+chrome.runtime.onMessage.addListener(async (request, sender, response) => {
+    if(request.action === 'makeSearch') {
+        sendMessageToChatGPT(request.action, request.input);
+    }else if(request.action === 'sendResponse') {
+        sendMessageToActiveTab(request.action, request.response);
     }
 })
 
@@ -32,8 +40,14 @@ function openChatGPT() {
     chrome.tabs.create({url: "https://chat.openai.com/chat"});
 }
 
-async function sendMessage(action) {
+async function sendMessageToActiveTab(action, response) {
     const activeTabID = await getActiveTabID();
 
-    chrome.tabs.sendMessage(activeTabID, {action:action});
+    chrome.tabs.sendMessage(activeTabID, {action, response});
+}
+
+async function sendMessageToChatGPT(action, input) {
+    const chatID = await getChatTabID();
+
+    chrome.tabs.sendMessage(chatID, {action, input})
 }

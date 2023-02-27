@@ -4,15 +4,47 @@ chrome.runtime.onMessage.addListener((request, sender, response) => {
     if(request.action === "on_screen_popup") {
         console.log('On screen popup activated');
         
-        if(!popup_visible)
+        if(!popup_visible) {
             container.style.display = "flex";
+            input.focus();
+        }
         else
             container.style.display = "none";
 
         popup_visible = !popup_visible;
 
+    }else if(request.action === 'sendResponse') {
+        if(!isReponseDivAdded())
+            addResponseContainer();
+        
+        // console.log('Request  is', request);
+        
+        updateResponseData(request.response);
     }
 });
+
+function sendMessage(action, input) {
+    chrome.runtime.sendMessage({action:action, input:input});
+}
+
+function isReponseDivAdded() {
+    // const div = document.querySelector('body > div:nth-child(5) > div > div:nth-child(2)')
+    const div = document.querySelector('#chatHead').nextElementSibling;
+
+    const sender = div.lastChild.querySelector('div').innerText.trim();
+    
+    if(sender == 'You:')
+        return false;
+    else
+        return true;
+}
+
+function updateResponseData(response) {
+    // const div = document.querySelector('body > div:nth-child(5) > div > div:nth-child(2)');
+    const div = document.querySelector('#chatHead').nextElementSibling;
+    // console.log(response);
+    div.lastChild.lastChild.innerText = response;
+}
 
 const container = document.createElement('div');
 container.style.display = 'flex';
@@ -29,6 +61,7 @@ container.style.zIndex = '999999';
 container.style.display = "none";
 
 const mainArea  = document.createElement('div');
+mainArea.id = 'chatContainer';
 mainArea.style.display = "flex";
 mainArea.style.flexDirection = 'column';
 mainArea.style.width = "480px";
@@ -39,6 +72,7 @@ mainArea.style.boxShadow = '2px 2px 22px 0px rgba(153,153,153,1)';
 container.appendChild(mainArea);
 
 const header = document.createElement('header');
+header.id = 'chatHead';
 header.style.display = 'flex';
 header.style.justifyContent = 'center';
 header.style.backgroundColor = '#202123';
@@ -73,6 +107,7 @@ input.style.width = '90%';
 input.style.padding = '10px';
 input.style.resize = 'none';
 input.rows = '1';
+input.focus();
 inputArea.appendChild(input);
 
 const button = document.createElement('button');
@@ -81,6 +116,7 @@ button.style.width = '10%';
 button.style.height = '40px';
 button.style.border = "none";
 button.style.outline = "none";
+button.style.cursor = "pointer";
 
 button.addEventListener('click', () => {
     const msg = document.createElement('div');
@@ -103,34 +139,40 @@ button.addEventListener('click', () => {
     message.style.padding = '5px';
     msg.appendChild(message);
     textArea.appendChild(msg);
+
+    sendMessage('makeSearch', input.value);
+
     input.value = '';
   });
   
   inputArea.appendChild(button);
 
-  // Create a div to hold the received messages
-const receivedArea = document.createElement('div');
-receivedArea.style.marginBottom = '10px';
-receivedArea.style.borderRadius = '5px';
-receivedArea.style.padding = '10px';
 
-// Create a div to hold the sender of the message
-const receiver = document.createElement('div');
-receiver.innerText = 'ChatGPT: ';
-receiver.style.backgroundColor = '#202123';
-receiver.style.color = 'white';
-receiver.style.borderRadius = '5px';
-receiver.style.padding = '5px';
-receivedArea.appendChild(receiver);
+function addResponseContainer() {
+    // Create a div to hold the received messages
+    const receivedArea = document.createElement('div');
+    receivedArea.style.marginBottom = '10px';
+    receivedArea.style.borderRadius = '5px';
+    receivedArea.style.padding = '10px';
 
-// Create a div to hold the message
-const receivedMessage = document.createElement('div');
-receivedMessage.innerText = 'Hello, how can I help you?';
-receivedMessage.style.backgroundColor = '#f2f2f2';
-receivedMessage.style.borderRadius = '5px';
-receivedMessage.style.padding = '5px';
-receivedArea.appendChild(receivedMessage);
-textArea.append(receivedArea);
+    // Create a div to hold the sender of the message
+    const receiver = document.createElement('div');
+    receiver.innerText = 'ChatGPT: ';
+    receiver.style.backgroundColor = '#202123';
+    receiver.style.color = 'white';
+    receiver.style.borderRadius = '5px';
+    receiver.style.padding = '5px';
+    receivedArea.appendChild(receiver);
+
+    // Create a div to hold the message
+    const receivedMessage = document.createElement('div');
+    receivedMessage.innerText = '';
+    receivedMessage.style.backgroundColor = '#f2f2f2';
+    receivedMessage.style.borderRadius = '5px';
+    receivedMessage.style.padding = '5px';
+    receivedArea.appendChild(receivedMessage);
+    textArea.append(receivedArea);
+}
 
 document.addEventListener('keypress', (event) => {
     if(event.shiftKey && event.key === 'Enter') {

@@ -21,7 +21,11 @@ const target = document.querySelector('main > div.flex-1.overflow-hidden > div >
 
 const observer = new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {
-        if(mutation.type === 'characterData') {
+        if(mutation.type === 'childList') {
+            sendResponse('newParagraph');
+            console.log('yaha aa gya');
+        }
+        else if(mutation.type === 'characterData') {
             let output = mutation.target.textContent.trimEnd();
             console.log('Output', output);
             sendResponse('sendResponse', output);

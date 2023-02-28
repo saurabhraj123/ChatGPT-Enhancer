@@ -1,4 +1,5 @@
 let popup_visible = false;
+let text = '';
 
 chrome.runtime.onMessage.addListener((request, sender, response) => {
     if(request.action === "on_screen_popup") {
@@ -14,17 +15,28 @@ chrome.runtime.onMessage.addListener((request, sender, response) => {
         popup_visible = !popup_visible;
 
     }else if(request.action === 'sendResponse') {
-        if(!isReponseDivAdded())
-            addResponseContainer();
-        
-        // console.log('Request  is', request);
-        
         updateResponseData(request.response);
+        console.log('In the sendResponse function');
+    }else if(request.action === 'newParagraph') {
+        console.log('In the new paragraph');
+        let currentParagraph = getCurrentParagraph();
+        console.log('Current Paragraph is:', currentParagraph);
+
+        if(!currentParagraph.endsWith('\n') && currentParagraph != '') {
+            text = (currentParagraph + '\n\n');
+            console.log('New text is:', text);
+        }
     }
 });
 
 function sendMessage(action, input) {
     chrome.runtime.sendMessage({action:action, input:input});
+}
+
+function getCurrentParagraph() {
+    const div = document.querySelector('#chatHead').nextElementSibling;
+    
+    return div?.lastChild?.lastChild?.innerText ? div.lastChild.lastChild.innerText : '';
 }
 
 function isReponseDivAdded() {
@@ -43,7 +55,7 @@ function updateResponseData(response) {
     // const div = document.querySelector('body > div:nth-child(5) > div > div:nth-child(2)');
     const div = document.querySelector('#chatHead').nextElementSibling;
     // console.log(response);
-    div.lastChild.lastChild.innerText = response;
+    div.lastChild.lastChild.innerText = text + response;
 }
 
 const container = document.createElement('div');
@@ -141,6 +153,9 @@ button.addEventListener('click', () => {
     textArea.appendChild(msg);
 
     sendMessage('makeSearch', input.value);
+    
+    addResponseContainer();
+    text = ''
 
     input.value = '';
   });

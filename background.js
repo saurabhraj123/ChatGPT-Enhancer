@@ -15,6 +15,8 @@ chrome.runtime.onMessage.addListener(async (request, sender, response) => {
         sendMessageToChatGPT(request.action, request.input);
     }else if(request.action === 'sendResponse') {
         sendMessageToActiveTab(request.action, request.response);
+    }else if(request.action === 'newParagraph') {
+        sendMessageToActiveTab(request.action);
     }
 })
 

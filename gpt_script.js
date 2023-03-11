@@ -1,3 +1,6 @@
+let content = '';
+let listening = false;
+
 chrome.runtime.onMessage.addListener((request, sender, response) => {
     if (request.action === 'makeSearch') {
         makeSearch(request.input);
@@ -37,4 +40,108 @@ const config = { childList: true, characterData: true, subtree: true };
 
 window.onload = () => {
     observer.observe(target, config);
+    // formObserver.observe(form, config);
+    addSpeakBtn();
+    bindSpeechFeature();
+}
+
+
+function addSpeakBtn() {
+    const formContainer = document.querySelector('form').lastChild.lastChild;
+
+    const speakBtn = document.createElement('img');
+    speakBtn.id = 'speakBtn';
+    speakBtn.src = chrome.runtime.getURL("images/mic.svg");
+    speakBtn.style.position = 'absolute';
+    speakBtn.style.bottom = '13px';
+    speakBtn.style.right = '45px';
+    speakBtn.style.width = '20px';
+    speakBtn.style.height = '20px';
+    speakBtn.style.zIndex = '999999999999';
+    speakBtn.style.cursor = 'pointer';
+
+    formContainer.appendChild(speakBtn);
+}
+
+function bindSpeechFeature() {
+    let speechRecognition = window.webkitSpeechRecognition;
+    let recognition = new speechRecognition();
+    recognition.interimResults = true;
+    const speakBtn = document.querySelector('#speakBtn');
+    console.log(speakBtn);
+
+    recognition.onstart = () => {
+        listening = true;
+        console.log('recognition started');
+    }
+
+    recognition.onspeechend = () => {
+        listening = false;
+        console.log('recognition end');
+    }
+
+    recognition.onerror = () => {
+        console.log('recognition error');
+    }
+
+    // recognition.onresult = (event) => {
+    //     let current = event.resultIndex;
+        
+    //     let transcript = event.results[current][0].transcript;
+
+    //     content += transcript;
+    //     console.log('content is->', content);
+
+    //     document.querySelector('textarea').value = content;
+    // }
+
+    recognition.addEventListener('result', (event) => {
+        let current = event.resultIndex;
+        
+        let transcript = event.results[0][0].transcript;
+
+        content = transcript;
+        console.log('content is->', content);
+
+        const textarea = document.querySelector('textarea');
+
+        
+        textarea.setAttribute("style", "height:" + (textarea.scrollHeight) + "px;overflow-y:hidden;");
+        textarea.addEventListener("input", OnInput, false);
+        
+
+        function OnInput() {
+            this.style.height = 0;
+            this.style.height = (this.scrollHeight) + "px";
+        }
+
+        textarea.style.height = 'auto';
+        textarea.value = content;
+        textarea.dispatchEvent(new Event('input'));
+    })
+
+    // recognition.addEventListener('interimresult', event => {
+    //     const transcript = Array.from(event.results)
+    //       .map(result => result[0].transcript)
+    //       .join(' ');
+        
+    //       content = transcript;
+    //   });
+
+    speakBtn.addEventListener('click', () => {
+        if(content.length) {
+            content = '';
+        }
+        console.log(speakBtn);
+
+        console.log('speech btn is clicked')
+
+        if(!listening) {
+            recognition.start();
+            // listening = true;
+        } else {
+            recognition.stop();
+            // listening = false;
+        }
+    })
 }

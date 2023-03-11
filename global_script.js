@@ -1,4 +1,5 @@
 let popup_visible = false;
+let scrolled = false;
 let text = '';
 
 chrome.runtime.onMessage.addListener((request, sender, response) => {
@@ -16,6 +17,9 @@ chrome.runtime.onMessage.addListener((request, sender, response) => {
 
     }else if(request.action === 'sendResponse') {
         updateResponseData(request.response);
+        scrollToBottom();
+
+        console.log('popup_visible:', popup_visible);
         console.log('In the sendResponse function');
     }else if(request.action === 'newParagraph') {
         console.log('In the new paragraph');
@@ -26,8 +30,17 @@ chrome.runtime.onMessage.addListener((request, sender, response) => {
             text = (currentParagraph + '\n\n');
             console.log('New text is:', text);
         }
+        console.log('popup_visible:', popup_visible);
+        scrollToBottom();
     }
 });
+
+function scrollToBottom() {
+    if(scrolled === false)
+        textArea.scrollTop = textArea.scrollHeight;
+    
+    console.log('scrolled is:', scrolled);
+}
 
 function sendMessage(action, input) {
     chrome.runtime.sendMessage({action:action, input:input});
@@ -189,7 +202,12 @@ function addResponseContainer() {
     textArea.append(receivedArea);
 }
 
-document.addEventListener('keypress', (event) => {
+container.addEventListener('keypress', (event) => {
+    if(!popup_visible) return;
+
+    scrolled = false;
+
+
     if(event.shiftKey && event.key === 'Enter') {
         event.preventDefault(); 
         input.value = input.value + '\n';
@@ -201,6 +219,34 @@ document.addEventListener('keypress', (event) => {
     }
     else if(event.key === 'Enter') {
         event.preventDefault(); 
+        
+        if(input.value.trim().length === 0) {
+            return;
+        }
+
         button.click();
+        scrollToBottom();
     } 
+})
+
+let previousScrollY = textArea.scrollTop;
+textArea.addEventListener("scroll", function() {
+    const currentScrollY = textArea.scrollTop;
+    if (currentScrollY < previousScrollY) 
+        scrolled = true;
+    else if(currentScrollY === previousScrollY)
+        scrolled = false;
+    
+    previousScrollY = currentScrollY;
+});    
+
+textArea.addEventListener('scroll', () => {
+    if(!popup_visible) return;
+
+    if (textArea.scrollY > this.previousScrollY) 
+        scrolled = true;
+    
+    this.previousScrollY = textArea.scrollY;
+    console.log('scrolled is', scrolled);
+    
 })

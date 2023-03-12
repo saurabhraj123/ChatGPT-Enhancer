@@ -5,6 +5,7 @@
     "version": "1.0",
     "permissions": [
         "tabs",
+        "activeTab",
         "commands"
     ],
     "background": {
@@ -12,7 +13,7 @@
     },
     "web_accessible_resources": [
         {
-          "resources": ["images/mic.svg"],
+          "resources": ["images/mic.svg", "images/copy.svg"],
           "matches": ["<all_urls>"]
         }
     ],

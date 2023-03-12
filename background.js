@@ -13,7 +13,7 @@ chrome.commands.onCommand.addListener(async (command) => {
 chrome.runtime.onMessage.addListener(async (request, sender, response) => {
     if(request.action === 'makeSearch') {
         sendMessageToChatGPT(request.action, request.input);
-    }else if(request.action === 'sendResponse') {
+    }else if(request.action === 'on_response_update') {
         sendMessageToActiveTab(request.action, request.response);
     }else if(request.action === 'newParagraph') {
         sendMessageToActiveTab(request.action);

@@ -3,37 +3,45 @@ let scrolled = false;
 let text = '';
 
 chrome.runtime.onMessage.addListener((request, sender, response) => {
-    if(request.action === "on_screen_popup") {
-        console.log('On screen popup activated');
+    if(request.action === "on_screen_popup") 
+        handlePopupVisibility();
+    else if(request.action === 'on_response_update') {
+        if(!popup_visible) return;
         
-        if(!popup_visible) {
-            container.style.display = "flex";
-            input.focus();
-        }
-        else
-            container.style.display = "none";
-
-        popup_visible = !popup_visible;
-
-    }else if(request.action === 'sendResponse') {
         updateResponseData(request.response);
         scrollToBottom();
 
-        console.log('popup_visible:', popup_visible);
-        console.log('In the sendResponse function');
+        console.log('In the on_response_update function');
     }else if(request.action === 'newParagraph') {
-        console.log('In the new paragraph');
-        let currentParagraph = getCurrentParagraph();
-        console.log('Current Paragraph is:', currentParagraph);
-
-        if(!currentParagraph.endsWith('\n') && currentParagraph != '') {
-            text = (currentParagraph + '\n\n');
-            console.log('New text is:', text);
-        }
-        console.log('popup_visible:', popup_visible);
-        scrollToBottom();
+        handleNewParagraph();
     }
 });
+
+function handlePopupVisibility() {
+    console.log('On screen popup activated');
+        
+    if(!popup_visible) {
+        container.style.display = "flex";
+        input.focus();
+    }
+    else
+        container.style.display = "none";
+
+    popup_visible = !popup_visible;
+}
+
+function handleNewParagraph() {
+    console.log('In the new paragraph');
+    let currentParagraph = getCurrentParagraph();
+    console.log('Current Paragraph is:', currentParagraph);
+
+    if(!currentParagraph.endsWith('\n') && currentParagraph != '') {
+        text = (currentParagraph + '\n\n');
+        console.log('New text is:', text);
+    }
+    console.log('popup_visible:', popup_visible);
+    scrollToBottom();
+}
 
 function scrollToBottom() {
     if(scrolled === false)

@@ -1,6 +1,6 @@
 {
     "manifest_version": 3,
-    "name": "ChatGPT Anywhere",
+    "name": "ChatGPT Anywhere Pro",
     "description": "An extension for easy access to ChatGPT with enhanced functionalities",
     "version": "1.0",
     "permissions": [

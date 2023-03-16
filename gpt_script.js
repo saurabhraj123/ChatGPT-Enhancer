@@ -101,7 +101,7 @@ function bindSpeechFeature() {
 
         setTimeout(() => {
             submitBtn.click();
-                
+
             const speakBtn = document.querySelector('#speakBtn');
             speakBtn.src = chrome.runtime.getURL("images/mic.svg");
         }, 1000)
@@ -111,6 +111,8 @@ function bindSpeechFeature() {
 
     recognition.onerror = () => {
         console.log('recognition error');
+        const speakBtn = document.querySelector('#speakBtn');
+        speakBtn.src = chrome.runtime.getURL("images/mic.svg");
     }
 
     recognition.addEventListener('result', (event) => {
@@ -144,10 +146,11 @@ function bindSpeechFeature() {
 
         if (!listening) {
             recognition.start();
-            // listening = true;
+            listening = true;
         } else {
-            recognition.stop();
             // listening = false;
+            const speakBtn = document.querySelector('#speakBtn');
+            speakBtn.src = chrome.runtime.getURL("images/mic-active.svg");
         }
     })
 }
@@ -158,7 +161,7 @@ function addCopyBtn() {
     // console.log('outerDiv:', outerDiv);
     let count = 0;
     outerDiv.forEach((innerDiv) => {
-        console.log(++count, ':', innerDiv.innerText);
+        // console.log(++count, ':', innerDiv.innerText);
         try {
             let likeDiv = innerDiv.getElementsByClassName('flex justify-between')[0].firstChild;
 

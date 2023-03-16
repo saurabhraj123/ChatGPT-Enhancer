@@ -8,7 +8,6 @@ chrome.runtime.onMessage.addListener((request, sender, response) => {
 })
 
 function makeSearch(input) {
-    // console.log('I am inside makeSearch');
     const textArea = document.querySelector('textarea');
     textArea.value = input;
 
@@ -25,15 +24,12 @@ const target = document.querySelector('main > div.flex-1.overflow-hidden > div >
 
 const observer = new MutationObserver((mutations) => {
     handlePageMutation();
-    // console.log('I am called');
     mutations.forEach((mutation) => {
         if (mutation.type === 'childList') {
             sendResponse('newParagraph');
-            // console.log('yaha aa gya');
         }
         else if (mutation.type === 'characterData') {
             let output = mutation.target.textContent.trimEnd();
-            // console.log('Output', output);
             sendResponse('on_response_update', output);
         }
     })
@@ -42,27 +38,26 @@ const observer = new MutationObserver((mutations) => {
 const config = { childList: true, characterData: true, subtree: true };
 
 window.onload = () => {
-    // console.log('window loaded');
     observer.observe(target, config);
-    
+
     addSpeakBtn();
     bindSpeechFeature();
+
+    setInterval(() => {
+        // console.log('Copy btn added');
+        addCopyBtn();
+    }, 500)
 }
 
 function handlePageMutation() {
     setInterval(() => {
         const speakBtn = document.querySelector('#speakBtn');
 
-        // console.log('run before');
-        if (speakBtn) return;
+        if(speakBtn) return;
 
         addSpeakBtn();
         bindSpeechFeature();
         observer.observe(target, config);
-
-        // console.log('run after');
-
-        // clearInterval(speakBtnCheck);
     }, 1000)
 }
 
@@ -91,20 +86,24 @@ function bindSpeechFeature() {
     let recognition = new speechRecognition();
     recognition.interimResults = true;
     const speakBtn = document.querySelector('#speakBtn');
-    console.log(speakBtn);
 
     recognition.onstart = () => {
         listening = true;
-        console.log('recognition started');
+        const speakBtn = document.querySelector('#speakBtn');
+        speakBtn.src = chrome.runtime.getURL("images/mic-active.svg");
+        // console.log('recognition started');
     }
 
     recognition.onspeechend = () => {
         listening = false;
-        console.log('recognition end');
+        // console.log('recognition end');
         const submitBtn = document.querySelector('button.absolute.p-1.rounded-md.text-gray-500.bottom-1\\.5.right-1.md\\:bottom-2\\.5.md\\:right-2.hover\\:bg-gray-100.dark\\:hover\\:text-gray-400.dark\\:hover\\:bg-gray-900.disabled\\:hover\\:bg-transparent.dark\\:disabled\\:hover\\:bg-transparent');
 
         setTimeout(() => {
             submitBtn.click();
+                
+            const speakBtn = document.querySelector('#speakBtn');
+            speakBtn.src = chrome.runtime.getURL("images/mic.svg");
         }, 1000)
 
         document.querySelector('textarea').style.height = 0;
@@ -118,7 +117,7 @@ function bindSpeechFeature() {
         let transcript = event.results[0][0].transcript;
 
         content = transcript;
-        console.log('content is->', content);
+        // console.log('content is->', content);
 
         const textarea = document.querySelector('textarea');
 
@@ -139,9 +138,9 @@ function bindSpeechFeature() {
         if (content.length) {
             content = '';
         }
-        console.log(speakBtn);
+        // console.log(speakBtn);
 
-        console.log('speech btn is clicked')
+        // console.log('speech btn is clicked')
 
         if (!listening) {
             recognition.start();
@@ -153,45 +152,49 @@ function bindSpeechFeature() {
     })
 }
 
-// const main = document.querySelector('main');
-// const mainObserver = new MutationObserver((mutations) => {
-//     console.log('mutation ho gya yaha he ram');
-//     addCopyBtn();
-// })
-
-setInterval(() => {
-    // console.log('bar bar dekho aur copy btn add karo');
-    addCopyBtn();
-}, 500)
-
 function addCopyBtn() {
-    const outerDiv = document.getElementsByClassName('relative flex w-[calc(100%-50px)] flex-col gap-1 md:gap-3 lg:w-[calc(100%-115px)]');
-    // console.log('inside copy btn fun');
-    for(let innerDiv of outerDiv) {
-        // console.log('inside loop')
-        let likeDiv = innerDiv.getElementsByClassName('flex justify-between')[0].firstChild;
-    
-        if(likeDiv) {
-            if(likeDiv.querySelector('.copyIcon')) return;
+    const outerDiv = document.querySelectorAll('.relative.flex.w-\\[calc\\(100\\%-50px\\)\\].flex-col.gap-1.md\\:gap-3.lg\\:w-\\[calc\\(100\\%-115px\\)\\]');
 
-            // console.log('Length like:', likeDiv.length);
-            const copyIcon = document.createElement('img');
-            copyIcon.classList.add("copyIcon");
-            copyIcon.classList.add('p-1');
-            copyIcon.style.height = '25px';
-            copyIcon.style.width = '21px';
-            copyIcon.style.cursor = 'pointer';
-            copyIcon.src = chrome.runtime.getURL('images/copy.svg');
-            
-            likeDiv.appendChild(copyIcon);
+    // console.log('outerDiv:', outerDiv);
+    let count = 0;
+    outerDiv.forEach((innerDiv) => {
+        console.log(++count, ':', innerDiv.innerText);
+        try {
+            let likeDiv = innerDiv.getElementsByClassName('flex justify-between')[0].firstChild;
 
-            likeDiv.addEventListener('click', () => {
-                const output = likeDiv.parentElement.parentElement.parentElement.innerText;
-                // console.log('output is:', output);
-                copyToClipboard(output);
-            })
-        }
-    }    
+            if (likeDiv) {
+                if (likeDiv.querySelector('.copyIcon')) return;
+
+                const copyIcon = document.createElement('img');
+                copyIcon.classList.add("copyIcon");
+                copyIcon.classList.add('p-1');
+                copyIcon.style.height = '30px';
+                copyIcon.style.width = '25px';
+                copyIcon.style.cursor = 'pointer';
+                copyIcon.src = chrome.runtime.getURL('images/copy.svg');
+                likeDiv.appendChild(copyIcon);
+
+                copyIcon.addEventListener('mouseover', () => {
+                    copyIcon.style.backgroundColor = '#ECECF1';
+                    copyIcon.style.borderRadius = '7px';
+                })
+
+                copyIcon.addEventListener('mouseleave', () => {
+                    copyIcon.style.backgroundColor = 'transparent';
+                })
+
+                copyIcon.addEventListener('click', () => {
+                    const output = likeDiv.parentElement.parentElement.parentElement.innerText;
+                    copyToClipboard(output);
+
+                    copyIcon.src = chrome.runtime.getURL('images/yes.svg');
+                    setTimeout(() => {
+                        copyIcon.src = chrome.runtime.getURL('images/copy.svg');
+                    }, 2000)
+                })
+            }
+        }catch(err) {};
+    });
 }
 
 function copyToClipboard(text) {
@@ -201,6 +204,5 @@ function copyToClipboard(text) {
     dummy.select();
     document.execCommand("copy");
     document.body.removeChild(dummy);
-  }
-  
-  
+}
+

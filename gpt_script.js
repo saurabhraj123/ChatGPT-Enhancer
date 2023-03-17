@@ -1,4 +1,6 @@
 let content = '';
+let speechText = '';
+let textToSpeechEnabled = true; 
 let listening = false;
 
 chrome.runtime.onMessage.addListener((request, sender, response) => {
@@ -20,20 +22,39 @@ function sendResponse(action, response) {
     chrome.runtime.sendMessage({ action: action, response: response })
 }
 
-const target = document.querySelector('main > div.flex-1.overflow-hidden > div > div > div');
+const divTarget = document.querySelector('main > div.flex-1.overflow-hidden > div > div > div');
+const target = document.querySelector('body');
 
 const observer = new MutationObserver((mutations) => {
     handlePageMutation();
+    console.log('mutations are happening');
     mutations.forEach((mutation) => {
         if (mutation.type === 'childList') {
             sendResponse('newParagraph');
-        }
-        else if (mutation.type === 'characterData') {
+            text = '';
+        } else if (mutation.type === 'characterData' && mutation.target === divTarget || target.contains(mutation.target)) {
             let output = mutation.target.textContent.trimEnd();
             sendResponse('on_response_update', output);
+
+            console.log('just before puncutation');
+            const lastChar = output.slice(-1) !== '"' ? output.slice(-1) : output[output.length - 2];
+            console.log('Text:', text, '-> lastChar:', lastChar);
+            if(isPunctuation(lastChar)) {
+                if(!textToSpeechEnabled) return;
+                
+                console.log('puncutation found');
+                let newPara = output.slice(text.length);
+                let speech = new SpeechSynthesisUtterance(newPara);
+                speechSynthesis.speak(speech);
+                text = output;
+            }
         }
     })
 })
+
+function isPunctuation(char) {
+    return char === '.' || char === '?' || char === '!' || char === ':';
+}
 
 const config = { childList: true, characterData: true, subtree: true };
 
@@ -46,6 +67,7 @@ window.onload = () => {
     setInterval(() => {
         // console.log('Copy btn added');
         addCopyBtn();
+        observer.observe(target, config);
     }, 500)
 }
 

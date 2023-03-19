@@ -13,10 +13,13 @@
     },
     "web_accessible_resources": [
         {
-          "resources": ["images/mic.svg", "images/copy.svg", "images/yes.svg", "images/mic-active.svg"],
+          "resources": ["images/mic.svg", "images/copy.svg", "images/yes.svg", "images/mic-active.svg", "images/ChatGPT_logo.svg"],
           "matches": ["<all_urls>"]
         }
     ],
+    "action": {
+        "default_popup": "popup.html"
+    },
     "content_scripts": [
         {
             "matches": [

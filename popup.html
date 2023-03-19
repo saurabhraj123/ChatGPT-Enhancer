@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="popup.css">
+    <title>ChatGPT Ehancer</title>
+</head>
+<body>
+    <div class="container">
+        <header class="main-header">
+            <img src="images/ChatGPT_logo.svg" alt="ChatGPT logo"/>
+            <h1>ChatGPT Enhancer</h1>
+        </header>
+
+        <div class="group">
+            <span class="label">Enable Voice Assistant</span>
+            <div class="toggle">
+                <div class="indicator"></div>
+            </div>
+        </div>
+
+        <div class="voice-range">
+            <label class="label" for="slider">Speech Rate</label>
+            <div class="range-input">
+                <input type="range" id="slider" name="slider" min="0.5" max="2" step="0.01">
+                <div class="output">
+                    <output id="rangevalue">1</output>
+                </div>
+            </div>
+        </div>
+
+        <div class="btn-container">
+            <button>
+                Test Speech
+            </button>
+        </div>
+    </div>
+    
+    <script src="popup.js"></script>
+</body>
+</html>

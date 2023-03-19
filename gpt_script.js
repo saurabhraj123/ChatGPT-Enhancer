@@ -22,6 +22,20 @@ function sendResponse(action, response) {
     chrome.runtime.sendMessage({ action: action, response: response })
 }
 
+const btnContainer = document.querySelector('.flex.ml-1.md\\:w-full.md\\:m-auto.md\\:mb-2.gap-0.md\\:gap-2.justify-center');
+
+const stopBtn = document.createElement('button');
+stopBtn.innerText = 'Stop Listening';
+stopBtn.classList.add("btn" ,"relative", "btn-neutral", "border-0", "md:border");
+btnContainer.appendChild(stopBtn);
+stopBtn.style.display = 'none';
+stopBtn.addEventListener('click', () => {
+    speechSynthesis.cancel();
+    console.log('text to speech band');
+    stopBtn.style.block = 'none';
+
+})
+
 const divTarget = document.querySelector('main > div.flex-1.overflow-hidden > div > div > div');
 const target = document.querySelector('body');
 
@@ -45,8 +59,14 @@ const observer = new MutationObserver((mutations) => {
                 console.log('puncutation found');
                 let newPara = output.slice(text.length);
                 let speech = new SpeechSynthesisUtterance(newPara);
+                speech.voice = speechSynthesis.getVoices().find(voice => voice.name === 'Google UK English Female');
+                
+
                 speechSynthesis.speak(speech);
+                
                 text = output;
+
+                
             }
         }
     })

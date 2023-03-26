@@ -1,5 +1,5 @@
 # ChatGPT-Enhancer
-A Chrome extension that enhances your browsing experience with the addition of Voice Assistant, Text-to-Speech, and a convenient Copy button for effortless text copying.
+A Chrome extension that enhances your ChatGPT experience with the addition of Voice Assistant, Text-to-Speech, and a convenient Copy button for effortless text copying.
 
 
 ## Voice Control

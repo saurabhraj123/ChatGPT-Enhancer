@@ -3,10 +3,17 @@ A Chrome extension that enhances your ChatGPT experience with the addition of Vo
 
 
 ## Voice Control
-![Microphone Working gif](https://github.com/saurabhraj123/store/blob/main/voice%20control%20(2).gif?raw=true)
+![Microphone](https://i.ibb.co/1QL5xd9/mic-2.png)
+
+**Gif**
+![Microphone speaking](https://i.ibb.co/ChM5T2Z/voice-control-2.gif)
 
 ## Copy Feature
-![Copy Icon Demonstration](https://github.com/saurabhraj123/store/blob/main/copy_gif.gif?raw=true)
+![Copy Icon Demonstration](https://i.ibb.co/Vxb0XTC/copy-image.png)
+
+**Gif**
+
+![Copy Icon demo](https://i.ibb.co/hsr0Z17/copy-gif.gif)
 
 ## Text-To-Speech Settings (Extension Popup Window)
-![Extension Popup](https://github.com/saurabhraj123/store/blob/main/gpt%20popup.png?raw=true)
+![Extension Popup](https://i.ibb.co/pX6qj0G/gpt-popup.png))
